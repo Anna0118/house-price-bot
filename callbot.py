@@ -50,6 +50,7 @@ class HousePriceBot(commands.Bot):
         await channel.send(embed=embed)
         # 再附完整 Excel
         await channel.send("完整 Excel 檔：", file=discord.File(excel_path))
+        await self.close()
 
 
 def main():
