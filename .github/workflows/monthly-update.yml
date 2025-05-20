@@ -1,0 +1,41 @@
+name: 每月房價更新
+
+# 排程觸發
+on:
+  schedule:
+  #  # 每月 1、11、21 日 UTC 00:00 執行（對應台北時間為當天 08:00）
+  #   - cron: '0 0 1,11,21 * *'
+    # 台北 00:00 → UTC 16:00，指定每月的 1、11、21 日
+    - cron: '0 16 1,11,21 * *'
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 把 repo 檔案檢出
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 安裝 Python
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      # 3. 安裝相依
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. 設定環境變數（從 Secrets 拿）
+      - name: Export Discord secrets
+        run: |
+          echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> $GITHUB_ENV
+          echo "DISCORD_CHANNEL_ID=${{ secrets.DISCORD_CHANNEL_ID }}" >> $GITHUB_ENV
+
+      # 5. 執行你的 Bot （只跑一次就結束）
+      - name: Run house price bot
+        run: |
+          python discord_helper.py
