@@ -4,3 +4,4 @@ python-dotenv
 xlrd
 discord.py
 schedule
+openpyxl
