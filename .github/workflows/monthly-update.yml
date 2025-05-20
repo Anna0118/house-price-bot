@@ -1,4 +1,4 @@
-name: 每月房價更新
+name: Monthly-house-price-update
 
 # 排程觸發
 on:

@@ -1,9 +1,6 @@
 requests
 pandas
 python-dotenv
-google-auth-oauthlib
-google-auth-httplib2
-google-api-python-client
+xlrd
 discord.py
 schedule
-beautifulsoup4
