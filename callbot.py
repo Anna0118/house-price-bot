@@ -42,7 +42,8 @@ class HousePriceBot(commands.Bot):
                 f"{item['建物現況格局-廳']}廳 "
                 f"{item['建物現況格局-衛']}衛／隔間：{item['建物現況格局-隔間']}\n"
                 f"車位：{item['車位類別']} ({item['車位總價元']}元)\n"
-                f"建案：{item['建案名稱']}／{item['棟及號']}"
+                f"建案：{item['建案名稱']}／{item['棟及號']}\n"
+                f"備註：{item['備註']}"
             )
             embed.add_field(name=name, value=value, inline=False)
 
