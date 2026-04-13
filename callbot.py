@@ -26,28 +26,46 @@ class HousePriceBot(commands.Bot):
         # Fetch real estate data for multiple regions
         results = process_data()
 
+        # Mapping file key to region display name
+        REGION_NAMES = {
+            "k_lvr_land_b": "苗栗縣",
+            "e_lvr_land_b": "高雄市",
+        }
+
         for file_key, records, excel_path in results:
+            region = REGION_NAMES.get(file_key, file_key)
             # Construct embed message for each region
             embed = discord.Embed(
-                title=f"🏠 房價資訊 - {file_key}",
+                title=f"{region}",
                 description="每月1, 11, 21號更新",
                 color=0x3498db
             )
             # Add up to 25 records as fields (Discord limit)
             for idx, item in enumerate(records[:25], start=1):
+                # Format date: 1150222 -> 115-02-22
+                raw_date = str(item['交易年月日'])
+                fmt_date = f"{raw_date[:3]}-{raw_date[3:5]}-{raw_date[5:7]}" if len(raw_date) == 7 else raw_date
+
                 parking_price = item['車位總價元']
-                parking_price_str = f"{int(parking_price):,}元" if parking_price and str(parking_price) != 'nan' else "無"
+                has_parking = parking_price and str(parking_price) not in ('nan', '0', '0.0')
+                parking_wan = round(parking_price / 10000) if has_parking else None
                 parking_type = item['車位類別'] if str(item['車位類別']) != 'nan' else "無"
+                parking_ping = item['車位坪數'] if has_parking else None
+                if has_parking:
+                    parking_str = f"{parking_type} / {parking_ping:.2f}坪 / {parking_wan}萬"
+                else:
+                    parking_str = "無"
+
                 project_name = item['建案名稱'] if str(item['建案名稱']) != 'nan' else "—"
                 price_wan = round(item['總價元'] / 10000)
-                name = f"{idx}. {project_name} | {item['鄉鎮市區']} | {price_wan}萬元 | {item['交易年月日']}"
+                name = f"{idx}. {project_name} | {item['鄉鎮市區']} | {price_wan} 萬 | {fmt_date}"
                 value = (
                     f"格局：{item['建物現況格局-房']}房 "
                     f"{item['建物現況格局-廳']}廳 "
                     f"{item['建物現況格局-衛']}衛／隔間：{item['建物現況格局-隔間']}\n"
-                    f"含車位：{item['含車位坪數']:.2f}坪，{item['含車位單價萬坪']:.1f}萬/坪\n"
                     f"不含車位：{item['不含車位坪數']:.2f}坪，{item['不含車位單價萬坪']:.1f}萬/坪\n"
-                    f"車位：{parking_type} ({parking_price_str})\n"
+                    f"含車位：{item['含車位坪數']:.2f}坪，{item['含車位單價萬坪']:.1f}萬/坪\n"
+                    f"車位資訊：{parking_str}\n"
                     f"樓層：{item['移轉層次']}/{item['總樓層數']}\n"
                     f"樓型：{item['建物型態']}\n"
                     f"都市土地使用分區：{item['都市土地使用分區']}\n"
