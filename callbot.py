@@ -35,15 +35,24 @@ class HousePriceBot(commands.Bot):
             )
             # Add up to 25 records as fields (Discord limit)
             for idx, item in enumerate(records[:25], start=1):
-                name = f"{idx}. {item['交易年月日']} | {item['鄉鎮市區']} | {item['總價元']}元"
+                parking_price = item['車位總價元']
+                parking_price_str = f"{int(parking_price):,}元" if parking_price and str(parking_price) != 'nan' else "無"
+                parking_type = item['車位類別'] if str(item['車位類別']) != 'nan' else "無"
+                project_name = item['建案名稱'] if str(item['建案名稱']) != 'nan' else "—"
+                price_wan = round(item['總價元'] / 10000)
+                name = f"{idx}. {project_name} | {item['鄉鎮市區']} | {price_wan}萬元 | {item['交易年月日']}"
                 value = (
-                    f"層次：{item['移轉層次']}／總樓層：{item['總樓層數']}\n"
-                    f"樓型：{item['建物型態']} ({item['主要用途']})\n"
                     f"格局：{item['建物現況格局-房']}房 "
                     f"{item['建物現況格局-廳']}廳 "
                     f"{item['建物現況格局-衛']}衛／隔間：{item['建物現況格局-隔間']}\n"
-                    f"車位：{item['車位類別']} ({item['車位總價元']}元)\n"
-                    f"建案：{item['建案名稱']}／{item['棟及號']}\n"
+                    f"含車位：{item['含車位坪數']:.2f}坪，{item['含車位單價萬坪']:.1f}萬/坪\n"
+                    f"不含車位：{item['不含車位坪數']:.2f}坪，{item['不含車位單價萬坪']:.1f}萬/坪\n"
+                    f"車位：{parking_type} ({parking_price_str})\n"
+                    f"樓層：{item['移轉層次']}/{item['總樓層數']}\n"
+                    f"樓型：{item['建物型態']}\n"
+                    f"都市土地使用分區：{item['都市土地使用分區']}\n"
+                    f"建案：{project_name}\n"
+                    f"棟及號：{item['棟及號']}\n"
                     f"備註：{item['備註']}"
                 )
                 embed.add_field(name=name, value=value, inline=False)
