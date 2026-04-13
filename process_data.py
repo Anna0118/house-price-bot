@@ -61,6 +61,11 @@ def process_data():
         df = df[cols]
 
         # Step 4: Calculate area in ping (1 sqm = 0.3025 ping)
+        # Convert to numeric first to handle object dtype from Excel
+        df['建物移轉總面積平方公尺'] = pd.to_numeric(df['建物移轉總面積平方公尺'], errors='coerce')
+        df['車位移轉總面積平方公尺'] = pd.to_numeric(df['車位移轉總面積平方公尺'], errors='coerce')
+        df['車位總價元'] = pd.to_numeric(df['車位總價元'], errors='coerce')
+        df['總價元'] = pd.to_numeric(df['總價元'], errors='coerce')
         df['含車位坪數'] = (df['建物移轉總面積平方公尺'] * 0.3025).round(2)
         df['車位坪數'] = (df['車位移轉總面積平方公尺'].fillna(0) * 0.3025).round(2)
         df['不含車位坪數'] = (df['含車位坪數'] - df['車位坪數']).round(2)
